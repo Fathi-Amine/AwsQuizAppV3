@@ -1,27 +1,31 @@
 <template>
   <div class="container">
-    <div>
+    <div class="quiz">
       <progress-bar :total-questions="questions.length" :current-question-index="index"></progress-bar>
 
-      <h2>{{ shuffledQuestions.question }}</h2>
+      <h2>{{ currentQuestion.question }}</h2>
       <div>
         <button
-  v-for="(choice, choiceIndex) in shuffledQuestions.choices"
-  :key="choiceIndex"
-  :class="{ 
-    selected: isChoiceSelected(choiceIndex), 
-    correct: isChoiceCorrect(choiceIndex) && answered, 
-    incorrect: selectedChoiceIndex === choiceIndex && answered && !isChoiceCorrect(choiceIndex) 
-  }"
-  @click="highlightSelected(choiceIndex)"
->
-  {{ choice.answer }}
-</button>
+          v-for="(choice, choiceIndex) in currentQuestion.choices"
+          :key="choiceIndex"
+          :class="{ 
+            selected: isChoiceSelected(choiceIndex), 
+            correct: isChoiceCorrect(choiceIndex) && answered, 
+            incorrect: selectedChoiceIndex === choiceIndex && answered && !isChoiceCorrect(choiceIndex) 
+          }"
+          @click="highlightSelected(choiceIndex)"
+        >
+          {{ choice.answer }}
+        </button>
 
       </div>
 
       <button :disabled="selectedChoiceIndex === null || answered" @click="checkAnswer">Submit</button>
-      <button :disabled="selectedChoiceIndex === null || !answered" @click="nextItem">Next</button>
+      <button v-if="showNextButton" :disabled="selectedChoiceIndex === null || !answered" @click="nextItem">Next</button>
+      <button v-if="showResultsButton" @click="showResults">Show Results</button>
+    </div>
+    <div class="results-container">
+      <h2>Results</h2>
     </div>
   </div>
 </template>
@@ -44,16 +48,20 @@ export default {
       answered: false,
       correct: false,
       userAnswers: [],
-      userWrongAnswers: []
+      userWrongAnswers: [],
+      showResultsButton: false,
+      shuffledQuestions: this.shuffleArray(this.questions)
     };
   },
   computed: {
-    shuffledQuestions() {
-      // Shuffle the questions array randomly
-      return this.shuffleArray(this.questions)[this.index];
+    currentQuestion() {
+      return this.shuffledQuestions[this.index];
     },
     correctAnswer() {
-      return this.shuffledQuestions.choices.find(choice => choice.isCorrect);
+      return this.currentQuestion.choices.find(choice => choice.isCorrect);
+    },
+    showNextButton() {
+      return this.index !== this.questions.length - 1;
     }
   },
   methods: {
@@ -80,33 +88,54 @@ export default {
     },
     isChoiceCorrect(index) {
       if (this.answered) {
-        const correctIndex = this.shuffledQuestions.choices.findIndex(choice => choice.isCorrect);
+        const correctIndex = this.currentQuestion.choices.findIndex(choice => choice.isCorrect);
         return index === correctIndex;
       } else {
         return false;
       }
     },
     checkAnswer() {
-        if (this.selectedChoiceIndex !== null) {
-            this.answered = true;
-            this.correct = this.isChoiceCorrect(this.selectedChoiceIndex);
-                if (!this.correct) {
-                this.userWrongAnswers.push({
-                    id: this.shuffledQuestions.id,
-                    answer: this.shuffledQuestions.choices[this.selectedChoiceIndex].answer
-                });
-                }
-            this.userAnswers.push({
-            id: this.shuffledQuestions.id,
-            answer: this.shuffledQuestions.choices[this.selectedChoiceIndex].answer
-            });
-            console.log(this.userAnswers);
-            console.log(this.userWrongAnswers);
+      if (this.selectedChoiceIndex !== null) {
+        this.answered = true;
+        this.correct = this.isChoiceCorrect(this.selectedChoiceIndex);
+        if (!this.correct) {
+          this.userWrongAnswers.push({
+            id: this.currentQuestion.id,
+            answer: this.currentQuestion.choices[this.selectedChoiceIndex].answer
+          });
         }
-    }
+        this.userAnswers.push({
+          id: this.currentQuestion.id,
+          answer: this.currentQuestion.choices[this.selectedChoiceIndex].answer
+        });
+        console.log(this.userAnswers);
+        console.log(this.userWrongAnswers);
+        if (this.index === this.questions.length - 1) {
+          this.showResultsButton = true;
+        }
+      }
+    },
+    showResults() {
+  const wrongAnswers = [];
+
+    this.userWrongAnswers.forEach(userAnswer => {
+      const question = this.questions.find(question => question.id === userAnswer.id);
+      const correctAnswer = question.choices.find(choice => choice.isCorrect).answer;
+
+      wrongAnswers.push({
+        question: question.question,
+        userAnswer: userAnswer.answer,
+        correctAnswer: correctAnswer,
+        feedback: question.description
+      });
+    });
+
+  return wrongAnswers
+}
   }
 };
 </script>
+
 
 <style>
 .selected {
