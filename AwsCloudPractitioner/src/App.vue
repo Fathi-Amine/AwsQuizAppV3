@@ -44,14 +44,15 @@
             description: "Amazon VPC lets users provision a logically isolated section of the AWS Cloud where users can launch AWS resources in a virtual network that they define."
         },
     ],
+    showQuiz: false,
   })
   }
 </script>
 <template>
   <body>
-    <stepper />
+    <stepper @start-quiz="showQuiz = true"/>
     <div>
-      <quiz :questions="questions"/>
+      <quiz v-if="showQuiz" :questions="questions"/>
     </div>
   </body>
 </template>

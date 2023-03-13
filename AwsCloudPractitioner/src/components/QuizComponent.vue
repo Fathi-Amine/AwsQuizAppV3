@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="quiz">
+    <div v-if="showQuiz" class="quiz">
       <progress-bar :total-questions="questions.length" :current-question-index="index"></progress-bar>
 
       <h2>{{ currentQuestion.question }}</h2>
@@ -24,8 +24,17 @@
       <button v-if="showNextButton" :disabled="selectedChoiceIndex === null || !answered" @click="nextItem">Next</button>
       <button v-if="showResultsButton" @click="showResults">Show Results</button>
     </div>
-    <div class="results-container">
+    <div  v-else class="results-container">
       <h2>Results</h2>
+      <ul>
+    <li v-for="wrongAnswer in wrongAnswers" :key="wrongAnswer.question">
+      <p>{{ wrongAnswer.question }}</p>
+      <p>Your answer: {{ wrongAnswer.userAnswer }}</p>
+      <p>Correct answer: {{ wrongAnswer.correctAnswer }}</p>
+      <p>Feedback: {{ wrongAnswer.feedback }}</p>
+    </li>
+  </ul>
+  <button @click="restartQuiz">Restart</button>
     </div>
   </div>
 </template>
@@ -50,7 +59,9 @@ export default {
       userAnswers: [],
       userWrongAnswers: [],
       showResultsButton: false,
-      shuffledQuestions: this.shuffleArray(this.questions)
+      shuffledQuestions: this.shuffleArray(this.questions),
+      showQuiz: true,
+      wrongAnswers: []
     };
   },
   computed: {
@@ -116,22 +127,33 @@ export default {
       }
     },
     showResults() {
-  const wrongAnswers = [];
+      this.wrongAnswers = [];
 
-    this.userWrongAnswers.forEach(userAnswer => {
-      const question = this.questions.find(question => question.id === userAnswer.id);
-      const correctAnswer = question.choices.find(choice => choice.isCorrect).answer;
+this.userWrongAnswers.forEach(userAnswer => {
+  const question = this.questions.find(question => question.id === userAnswer.id);
+  const correctAnswer = question.choices.find(choice => choice.isCorrect).answer;
 
-      wrongAnswers.push({
-        question: question.question,
-        userAnswer: userAnswer.answer,
-        correctAnswer: correctAnswer,
-        feedback: question.description
-      });
-    });
+  this.wrongAnswers.push({
+    question: question.question,
+    userAnswer: userAnswer.answer,
+    correctAnswer: correctAnswer,
+    feedback: question.description
+  });
+});
 
-  return wrongAnswers
-}
+this.showQuiz = false;
+},
+restartQuiz() {
+      this.index = 0;
+      this.selectedChoiceIndex = null;
+      this.answered = false;
+      this.correct = false;
+      this.userAnswers = [];
+      this.userWrongAnswers = [];
+      this.showResultsButton = false;
+      this.wrongAnswers = [];
+      this.shuffledQuestions = this.shuffleArray(this.questions);
+    }
   }
 };
 </script>

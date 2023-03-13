@@ -1,51 +1,81 @@
-<script>
-    export default {
-        data: ()=>({
-            step: 1
-        }),
-        computed: {
-            stepperProgress(){
-                return (100 / 3) * ( this.step - 1) + '%'
-            }
-        }
-    }
-</script>
 <template>
     <div class="stepper-container">
-        <div class="stepper">
-            <div class="stepper-progress">
-                <div class="stepper-progress-bar" :style="'width:' + stepperProgress">
-
-                </div>
-            </div>
-            <div class="stepper-item" :class="{'current': step == item, 'success': step > item}" v-for="item in 4" :key="item">
-                <div class="stepper-item-counter">
-                    <img class="icon-success" src="@/assets/images/checked.png" alt="">
-                    <span class="number">
-                        {{ item }}
-                    </span>
-                </div>
-                <span class="stepper-item-title">
-                    step {{ item }}
-                </span>
-            </div>
+      <div class="stepper">
+        <div class="stepper-progress">
+          <div class="stepper-progress-bar" :style="'width:' + stepperProgress">
+  
+          </div>
         </div>
-        <div class="stepper-content" v-for="item in 4" :key="item">
-            <div class="stepper-sheet" v-if="step == item">
-                <p>Lorem ipsum dolor sit amet consectetur. {{ item }}</p>
-                <button v-if="step == 4">start</button>
-            </div>
+        <div class="stepper-item" :class="{'current': step == item, 'success': step > item}" v-for="item in 4" :key="item">
+          <div class="stepper-item-counter">
+            <img class="icon-success" src="@/assets/images/checked.png" alt="">
+            <span class="number">
+              {{ item }}
+            </span>
+          </div>
+          <span class="stepper-item-title">
+            Step {{ item }}
+          </span>
         </div>
-        <div class="controls">
-            <button class="btn" @click="step--" :disabled="step == 1">
-                back
-            </button>
-            <button class="btn btn-purple-1" @click="step++" :disabled="step == 4">
-                next
-            </button>
+      </div>
+      <div class="stepper-content">
+        <div class="stepper-sheet" v-if="step === 1">
+          <p>Please enter your name:</p>
+          <input type="text" v-model="name" />
         </div>
+        <div class="stepper-sheet" v-else-if="step === 2">
+          <p>Here are the rules:</p>
+          <ul>
+            <li>Rule 1</li>
+            <li>Rule 2</li>
+            <li>Rule 3</li>
+          </ul>
+        </div>
+        <div class="stepper-sheet" v-else-if="step === 3">
+          <p>Are you ready to start the quiz?</p>
+          <button class="btn btn-purple-1" @click="$emit('start-quiz')">Start Quiz</button>
+        </div>
+        <div class="stepper-sheet" v-else-if="step === 4">
+          <p>Congratulations! You have completed the quiz.</p>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn" @click="step--" :disabled="step === 1">
+          Back
+        </button>
+        <button class="btn btn-purple-1" @click="nextStep" :disabled="step === 4 || (step === 1 && name.length === 0)">
+          Next
+        </button>
+      </div>
     </div>
-</template>
+  </template>
+  
+  <script>
+  export default {
+    data: () => ({
+      step: 1,
+      name: '',
+    }),
+    computed: {
+      stepperProgress() {
+        return (100 / 3) * (this.step - 1) + '%'
+      },
+      isNameEntered() {
+        return this.name.length > 0
+      },
+    },
+    methods: {
+      nextStep() {
+        if (this.step < 4) {
+          this.step++
+        }
+      },
+    },
+  }
+  </script>
+  
+  
+  
 <style>
 .stepper-container{
     background-color: #fff;
