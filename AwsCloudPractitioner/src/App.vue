@@ -50,21 +50,20 @@
 </script>
 <template>
   <body>
-    <stepper @start-quiz="showQuiz = true"/>
-    <div>
-      <quiz v-if="showQuiz" :questions="questions"/>
-    </div>
+    <stepper v-if="!showQuiz" @start-quiz="showQuiz = true"/>
+    <quiz v-else-if="showQuiz" :questions="questions"/>
   </body>
 </template>
 <style>
 body{
   background-image: linear-gradient(60deg,#ab3cfc 0%,#7e6df3 100%);
   color: #fff;
-  width: 100%;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: 3rem;
 }
 </style>
 

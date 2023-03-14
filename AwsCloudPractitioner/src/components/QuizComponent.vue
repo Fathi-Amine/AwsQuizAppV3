@@ -1,11 +1,14 @@
 <template>
   <div class="container">
     <div v-if="showQuiz" class="quiz">
-      <progress-bar :total-questions="questions.length" :current-question-index="index"></progress-bar>
+      <div class="progress">
+        <progress-bar :total-questions="questions.length" :current-question-index="index"></progress-bar>
+      </div>
 
       <h2>{{ currentQuestion.question }}</h2>
       <div>
         <button
+        class="choiceBtn"
           v-for="(choice, choiceIndex) in currentQuestion.choices"
           :key="choiceIndex"
           :class="{ 
@@ -20,21 +23,23 @@
 
       </div>
 
-      <button :disabled="selectedChoiceIndex === null || answered" @click="checkAnswer">Submit</button>
-      <button v-if="showNextButton" :disabled="selectedChoiceIndex === null || !answered" @click="nextItem">Next</button>
-      <button v-if="showResultsButton" @click="showResults">Show Results</button>
+      <div class="btns-wrapper">
+        <button class="navBtn" :disabled="selectedChoiceIndex === null || answered" @click="checkAnswer">Submit</button>
+        <button class="navBtn" v-if="showNextButton" :disabled="selectedChoiceIndex === null || !answered" @click="nextItem">Next</button>
+        <button class="navBtn" v-if="showResultsButton" @click="showResults">Show Results</button>
+      </div>
     </div>
     <div  v-else class="results-container">
       <h2>Results</h2>
       <ul>
-    <li v-for="wrongAnswer in wrongAnswers" :key="wrongAnswer.question">
+    <li class="feedback" v-for="wrongAnswer in wrongAnswers" :key="wrongAnswer.question">
       <p>{{ wrongAnswer.question }}</p>
-      <p>Your answer: {{ wrongAnswer.userAnswer }}</p>
-      <p>Correct answer: {{ wrongAnswer.correctAnswer }}</p>
-      <p>Feedback: {{ wrongAnswer.feedback }}</p>
+      <p class="userAnswer">Your answer: {{ wrongAnswer.userAnswer }}</p>
+      <p class="correctAnswer">Correct answer: {{ wrongAnswer.correctAnswer }}</p>
+      <p class="desc">Feedback: {{ wrongAnswer.feedback }}</p>
     </li>
   </ul>
-  <button @click="restartQuiz">Restart</button>
+  <button class="navBtn restartBtn" @click="restartQuiz">Restart</button>
     </div>
   </div>
 </template>
@@ -150,9 +155,11 @@ restartQuiz() {
       this.correct = false;
       this.userAnswers = [];
       this.userWrongAnswers = [];
+      this.showQuiz = false;
       this.showResultsButton = false;
       this.wrongAnswers = [];
       this.shuffledQuestions = this.shuffleArray(this.questions);
+      location.reload();
     }
   }
 };
@@ -160,6 +167,12 @@ restartQuiz() {
 
 
 <style>
+.container{
+  width: 500px;
+  background-color: #533b7c;
+  padding: 2rem 1rem ;
+  border-radius: 20px;
+}
 .selected {
   background-color: yellow;
 }
@@ -168,6 +181,88 @@ restartQuiz() {
 }
 .incorrect {
   background-color: red;
+}
+.progress{
+  width: 200px;
+}
+
+.btns-wrapper{
+  display: flex;
+  justify-content:flex-start;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+.choiceBtn{
+  display: block;
+  background-color: #7e6df3;
+  font-size: 1.25rem;
+  font-weight: 600;
+  width: 100%;
+  height: 3rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  cursor:pointer;
+}
+
+.choiceBtn:hover{
+  opacity: 0.8;
+}
+
+.navBtn{
+  width: 6rem;
+  height: 3rem;
+  font-size:1rem;
+  font-weight: 700;
+  background-color: #3e394c;
+  color: #fff;
+  border-radius: 12px;
+  border: none;
+  cursor:pointer;
+}
+
+.navBtn:disabled{
+  opacity: 0.5;
+}
+.selected {
+  background-color: yellow;
+  color: black;
+}
+.correct {
+  background-color: green;
+}
+.incorrect {
+  background-color: red;
+}
+
+.feedback{
+  background-color: #9f8cca;
+  padding: 1rem;
+}
+
+.feedback .userAnswer{
+  background-color: red;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+.feedback .correctAnswer{
+  background-color: green;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.feedback .desc{
+  background-color: #7e6df3;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.restartBtn {
+  display: block;
+  margin: 0 auto;
+  cursor:pointer;
 }
 </style>
 

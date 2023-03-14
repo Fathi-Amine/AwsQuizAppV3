@@ -35,14 +35,14 @@
 <style>
   .progress-bar {
     background-color: #e0e0de;
-    height: 10px;
+    height: 30px;
     width: 100%;
     border-radius: 5px;
     overflow: hidden;
   }
 
   .progress-bar-inner {
-    background-color: #0072c6;
+    background-color: #ab3cfc;
     height: 100%;
     width: 0;
     transition: width 0.5s ease;

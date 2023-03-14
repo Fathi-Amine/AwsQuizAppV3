@@ -6,7 +6,7 @@
   
           </div>
         </div>
-        <div class="stepper-item" :class="{'current': step == item, 'success': step > item}" v-for="item in 4" :key="item">
+        <div class="stepper-item" :class="{'current': step == item, 'success': step > item}" v-for="item in 3" :key="item">
           <div class="stepper-item-counter">
             <img class="icon-success" src="@/assets/images/checked.png" alt="">
             <span class="number">
@@ -26,24 +26,24 @@
         <div class="stepper-sheet" v-else-if="step === 2">
           <p>Here are the rules:</p>
           <ul>
-            <li>Rule 1</li>
-            <li>Rule 2</li>
-            <li>Rule 3</li>
+            <li>You can't pass to another question without answering</li>
+            <li>In the end of the quiz you'll get the feedback containing the wrong answers and their correction</li>
+            <li>You can redo the quiz at the end</li>
           </ul>
         </div>
         <div class="stepper-sheet" v-else-if="step === 3">
           <p>Are you ready to start the quiz?</p>
-          <button class="btn btn-purple-1" @click="$emit('start-quiz')">Start Quiz</button>
+          <button class="btn btn-purple-1 startBtn" @click="$emit('start-quiz')">Start Quiz</button>
         </div>
-        <div class="stepper-sheet" v-else-if="step === 4">
+        <!-- <div class="stepper-sheet" v-else-if="step === 4">
           <p>Congratulations! You have completed the quiz.</p>
-        </div>
+        </div> -->
       </div>
       <div class="controls">
         <button class="btn" @click="step--" :disabled="step === 1">
           Back
         </button>
-        <button class="btn btn-purple-1" @click="nextStep" :disabled="step === 4 || (step === 1 && name.length === 0)">
+        <button class="btn btn-purple-1" @click="nextStep" :disabled="step === 3 || (step === 1 && name.length === 0)">
           Next
         </button>
       </div>
@@ -58,7 +58,7 @@
     }),
     computed: {
       stepperProgress() {
-        return (100 / 3) * (this.step - 1) + '%'
+        return (100 / 2) * (this.step - 1) + '%'
       },
       isNameEntered() {
         return this.name.length > 0
@@ -66,7 +66,7 @@
     },
     methods: {
       nextStep() {
-        if (this.step < 4) {
+        if (this.step < 3) {
           this.step++
         }
       },
@@ -77,8 +77,13 @@
   
   
 <style>
+li{
+  list-style:decimal;
+  text-align: left;
+}
 .stepper-container{
     background-color: #fff;
+    min-width: 600px;
     padding: 60px;
     border-radius: 32px;
     box-shadow: rgba(#000, #000, #000, 0.9);
@@ -87,7 +92,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 660px;
+    width: 100%;
     position: relative;
     z-index: 0;
     margin-bottom: 24px;
@@ -180,7 +185,7 @@
 .stepper-sheet{
     color: #3e394c;
     text-align: center;
-    padding: 120px 60px;
+    padding: 80px 40px;
     margin-top: 50px;
     box-shadow: 0px -1px 35px 1px rgba(0,0,0,0.43);
 -webkit-box-shadow: 0px -1px 35px 1px rgba(0,0,0,0.43);
